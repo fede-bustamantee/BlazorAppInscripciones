@@ -1,4 +1,5 @@
-﻿@page "/counter"
+﻿@page "/counter/{valorInicialParameter?}"
+@inject ILogger<Counter> logger
 
 <PageTitle>Counter</PageTitle>
 
@@ -8,11 +9,44 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
-@code {
+@code
+{
     private int currentCount = 0;
+
+    [Parameter]
+    public string valorInicialParameter { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? valorInicialPorUrl { get; set; }
+
+    protected override void OnInitialized()
+    {
+        logger.LogInformation("Se inicializó el componente");
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        logger.LogInformation("Se renderizo el componente");
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.TryGetValue<string>(nameof(valorInicialParameter), out var value))
+        {
+            if (value is not null) valorInicialParameter = value;
+        }
+        await base.SetParametersAsync(parameters);
+    }
+    protected override void OnParametersSet()
+    {
+        currentCount = valorInicialParameter != null ? int.Parse(valorInicialParameter) : 0;
+        currentCount = valorInicialPorUrl != null ? int.Parse(valorInicialPorUrl) : currentCount;
+        logger.LogInformation("Se enviaron los parametros");
+    }
 
     private void IncrementCount()
     {
         currentCount++;
     }
-}
+    }
