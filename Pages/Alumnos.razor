@@ -1,0 +1,56 @@
+﻿@page "/alumnos"
+@inject HttpClient Http
+
+<PageTitle>Alumnos</PageTitle>
+
+@* <Componente Titulo="Alumnos"/> *@
+
+<p>Alumnos del sitio web.</p>
+
+@if (students == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Apellido y Nombre</th>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in students)
+            {
+                <tr>
+                    <td>@student.apellidoNombre</td>
+                    <td>@student.telefono</td>
+                    <td>@student.direccion</td>
+                    <td>@student.email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Alumno[]? students;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await Http.GetFromJsonAsync<Alumno[]>("https://inscripcionesfedeb.azurewebsites.net/api/apialumnos");
+    }
+
+    public class Alumno
+    {
+        public int id { get; set; }
+        public string apellidoNombre { get; set; }=string.Empty;
+        public string telefono { get; set; } = string.Empty;
+        public string direccion { get; set; } = string.Empty;
+        public string email { get; set; } = string.Empty;
+    }
+}

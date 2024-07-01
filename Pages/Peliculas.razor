@@ -1,0 +1,63 @@
+﻿@page "/peliculas"
+@inject HttpClient Http
+
+<PageTitle>Peliculas</PageTitle>
+
+<h1>Peliculas</h1>
+
+<p>Los mejores estrenos</p>
+
+@if (pelis == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Genero</th>
+                <th>Duracion</th>
+                <th>Sinopsis</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var peli in pelis)
+            {
+                <tr>
+                    <td>@peli.nombre</td>
+                    <td>@peli.genero</td>
+                    <td>@peli.duracion</td>
+                    <td>@peli.sinopsis</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Pelicula[]? pelis;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pelis = await Http.GetFromJsonAsync<Pelicula[]>("https://practprof2023-2855.restdb.io/rest/peliculas?apikey=6466d9870b60fc42f4e197bf");
+    }
+
+    public class Pelicula
+    {
+        public string _id { get; set; }
+
+        public string nombre { get; set; } 
+
+        public string genero { get; set; } 
+
+        public int duracion { get; set; }
+
+        public string trailer_url { get; set; } 
+
+        public string sinopsis { get; set; } 
+
+        public string portada_url { get; set; } 
+    }
+}
