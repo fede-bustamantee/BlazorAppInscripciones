@@ -3,7 +3,7 @@
 
 <PageTitle>Carreras</PageTitle>
 
-<ComponenteTitulo Titulo="Alumnos" />
+<ComponenteTitulo Titulo="Carreras" />
 
 <p>Carreras del sitio web</p>
 
@@ -13,6 +13,9 @@
 }
 else
 {
+    <td>
+        <NavLink class="nav-link" href="nuevacarrera">Nueva Carrera</NavLink>
+    </td>
     <table class="table">
         <thead>
             <tr>
@@ -26,6 +29,9 @@ else
                 <tr>
                     <td>@study.id</td>
                     <td>@study.nombre</td>
+                    <td>
+                       <NavLink class="nav-link" href="@($"editarcarrera?idCarrera={@study.id}")">Editar</NavLink>
+                    </td>
                 </tr>
             }
         </tbody>

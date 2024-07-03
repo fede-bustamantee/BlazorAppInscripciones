@@ -13,6 +13,9 @@
 }
 else
 {
+    <td>
+        <NavLink class="nav-link" href="nuevoalumno">Nuevo Alumno</NavLink>
+    </td>
     <table class="table">
         <thead>
             <tr>
@@ -30,6 +33,7 @@ else
                     <td>@student.telefono</td>
                     <td>@student.direccion</td>
                     <td>@student.email</td>
+                    <NavLink class="nav-link" href="@($"editaralumno?idAlumno={student.id}")">Editar</NavLink>
                 </tr>
             }
         </tbody>

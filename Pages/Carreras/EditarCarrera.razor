@@ -1,0 +1,50 @@
+﻿@page "/editarcarrera"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@if (carrera == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <h3>Editando carrera @carrera.nombre</h3>
+    <EditForm Model="carrera" OnValidSubmit="GuardarCarrera">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <label class="form-control" for="txtCarrera">Carrera:</label>
+        <input class="form-control" type="text" @bind="carrera.nombre" />
+        <button class="btn btn-primary" type="submit">Guardar</button>
+        <button class="btn btn-primary" type="button" @onclick="Volver">Cancelar</button>
+    </EditForm>
+}
+@code {
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? idCarrera { get; set; }
+
+    public Carrera? carrera { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        carrera = await Http.GetFromJsonAsync<Carrera>("https://inscripcionesfedeb.azurewebsites.net/api/apicarreras/" + idCarrera);
+    }
+
+    public class Carrera
+    {
+        public int id { get; set; }
+        [Required(ErrorMessage = "El nombre debe cargarse obligatoriamente")]
+        public string nombre { get; set; } = string.Empty;
+    }
+
+    private async Task GuardarCarrera()
+    {
+        var response = await Http.PutAsJsonAsync($"https://inscripcionesfedeb.azurewebsites.net/api/apicarreras/{carrera?.id}", carrera);
+        NavigationManager.NavigateTo("/carreras");
+    }
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/carreras");
+    }
+}

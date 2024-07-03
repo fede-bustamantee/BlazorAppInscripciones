@@ -1,0 +1,62 @@
+﻿@page "/nuevoalumno"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@if (alumno == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <h3>Crear carrera @alumno.apellidoNombre</h3>
+    <EditForm Model="alumno" OnValidSubmit="GuardarCarrera">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <label class="form-control" for="txtApellidoNombre">Nombre y Apellido:</label>
+        <input class="form-control" type="text" @bind="alumno.apellidoNombre" />
+
+        <label class="form-control" for="txtTelefono">Telefono:</label>
+        <input class="form-control" type="text" @bind="alumno.telefono" />
+
+        <label class="form-control" for="txtDireccion">Direccion:</label>
+        <input class="form-control" type="text" @bind="alumno.direccion" />
+
+        <label class="form-control" for="txtTelefono">Telefono:</label>
+        <input class="form-control" type="text" @bind="alumno.telefono" />
+
+        <label class="form-control" for="txtEmail">Email:</label>
+        <input class="form-control" type="text" @bind="alumno.email" />
+        <ValidationSummary />
+        <button class="btn btn-primary" type="submit">Guardar</button>
+        <button class="btn btn-primary" type="button" @onclick="Volver">Cancelar</button>
+    </EditForm>
+}
+@code {
+
+    public Alumno? alumno { get; set; }
+
+    protected override void OnInitialized()
+    {
+        alumno = new Alumno();
+    }
+
+    public class Alumno
+    {
+        public int id { get; set; }
+        [Required(ErrorMessage = "El nombre debe cargarse obligatoriamente")]
+        public string apellidoNombre { get; set; } = string.Empty;
+        public string telefono { get; set; } = string.Empty;
+        public string direccion { get; set; } = string.Empty;
+        public string email { get; set; } = string.Empty;
+    }
+
+    private async Task GuardarCarrera()
+    {
+        var response = await Http.PostAsJsonAsync($"https://inscripcionesfedeb.azurewebsites.net/api/apialumnos", alumno);
+        NavigationManager.NavigateTo("/alumnos");
+    }
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/alumnos");
+    }
+}

@@ -1,0 +1,67 @@
+﻿@page "/editaralumno"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@if (alumno == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <h3>Editando carrera @alumno.apellidoNombre</h3>
+    <EditForm Model="alumno" OnValidSubmit="GuardarAlumno">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <label class="form-control" for="txtApellidoNombre">Nombre y Apellido:</label>
+        <input class="form-control" type="text" @bind="alumno.apellidoNombre" />
+
+        <label class="form-control" for="txtTelefono">Telefono:</label>
+        <input class="form-control" type="text" @bind="alumno.telefono" />
+
+        <label class="form-control" for="txtDireccion">Direccion:</label>
+        <input class="form-control" type="text" @bind="alumno.direccion" />
+
+        <label class="form-control" for="txtTelefono">Telefono:</label>
+        <input class="form-control" type="text" @bind="alumno.telefono" />
+
+        <label class="form-control" for="txtEmail">Email:</label>
+        <input class="form-control" type="text" @bind="alumno.email" />
+
+        <button class="btn btn-primary" type="submit">Guardar</button>
+        <button class="btn btn-primary" type="button" @onclick="Volver">Cancelar</button>
+    </EditForm>
+}
+@code {
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? idAlumno { get; set; }
+
+    public Alumno? alumno { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        alumno = await Http.GetFromJsonAsync<Alumno>("https://inscripcionesfedeb.azurewebsites.net/api/apialumnos/" + idAlumno);
+    }
+
+    public class Alumno
+    {
+        public int id { get; set; }
+        [Required(ErrorMessage = "El nombre debe cargarse obligatoriamente")]
+        public string apellidoNombre { get; set; } = string.Empty;
+        public string telefono { get; set; } = string.Empty;
+        public string direccion { get; set; } = string.Empty;
+        public string email { get; set; } = string.Empty;
+    }
+
+    private async Task GuardarAlumno()
+    {
+        var response = await Http.PutAsJsonAsync($"https://inscripcionesfedeb.azurewebsites.net/api/apialumnos/{alumno?.id}", alumno);
+        NavigationManager.NavigateTo("/alumnos");
+    }
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/alumnos");
+    }
+}
