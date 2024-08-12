@@ -1,0 +1,72 @@
+﻿@inject IGenericService<TurnoExamen> turnoExamenService
+@inject ILogger<NuevoEditarTurnoExamen> logger
+
+@if (turnoExamenEdit == null )
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div style="background-color: @(isEditing ? "lightyellow": "white")">
+        <EditForm Model="@turnoExamenEdit" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+        <div class="container">
+            <div class="row">
+                <InputTextNombre Entity="@turnoExamenEdit" TextLabel="Turno examen:"/>
+                <ValidationSummary />
+                <ButtonsGuardarCancelar isEditing="@isEditing"  OnCancelar="HandleCancelar" />
+            </div>
+        </div>
+        </EditForm>
+    </div>
+}
+@code {
+
+    [Parameter]
+    public EventCallback OnGuardar { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelar { get; set; }
+
+    [Parameter]
+    public TurnoExamen? turnoExamen { get; set; }
+
+    public TurnoExamen? turnoExamenEdit { get; set; }
+
+
+
+    private bool isEditing => turnoExamen != null;
+
+    private List<TurnoExamen>? turnosExamen { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (turnoExamen == null)
+        {
+            turnoExamenEdit = new TurnoExamen();
+            logger.LogInformation("se instanció turnoExamenEdit");
+        } else
+        {
+            turnoExamen.CopyPropertiesTo(turnoExamenEdit);
+        }
+
+
+        StateHasChanged();
+    }
+
+
+    private async Task Guardar()
+    {
+        logger.LogInformation($"la variable isEditing={isEditing} y el turno de examen={turnoExamenEdit?.ToString()}");
+        if (isEditing)
+                await turnoExamenService.UpdateAsync(turnoExamenEdit);
+            else
+            await turnoExamenService.AddAsync(turnoExamenEdit);
+            await OnGuardar.InvokeAsync();
+    }
+
+    private async Task HandleCancelar()
+    {
+        await OnCancelar.InvokeAsync();
+    }
+}

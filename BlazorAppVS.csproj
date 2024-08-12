@@ -7,28 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Layout\ComponenteTitulo.razor.css" />
+    <None Include="Layout\ComponenteTitulo.razor" />
+    <None Include="Layout\MainLayout.razor" />
+    <None Include="Layout\NavMenu.razor" />
+    <None Include="Pages\Alumnos\Alumnos.razor" />
+    <None Include="Pages\Alumnos\EditarAlumno.razor" />
+    <None Include="Pages\Alumnos\NuevoAlumno.razor" />
+    <None Include="Pages\Carreras\Carreras.razor" />
+    <None Include="Pages\Carreras\EditarCarrera.razor" />
+    <None Include="Pages\Carreras\NuevaCarrera.razor" />
+    <None Include="Pages\Counter.razor" />
+    <None Include="Pages\Home.razor" />
+    <None Include="Pages\Peliculas.razor" />
+    <None Include="Pages\Weather.razor" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Layout\ComponenteTitulo.razor.css" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="CurrieTechnologies.Razor.SweetAlert2" Version="5.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.6" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="Pages\Alumnos\NuevoAlumno.razor">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-    <Content Update="Pages\Carreras\NuevaCarrera.razor">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-    <Content Update="Pages\Carreras\EditarCarrera.razor">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
   </ItemGroup>
 
 </Project>

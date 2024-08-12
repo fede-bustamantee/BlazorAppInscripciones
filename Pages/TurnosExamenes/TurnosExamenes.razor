@@ -1,0 +1,63 @@
+﻿@page "/turnosexamenes"
+
+@inject IGenericService<TurnoExamen> turnoExamenService
+@inject SweetAlertService SweetAlert
+
+<PageTitle>Turnos de exámenes</PageTitle>
+<h1>Turnos de exámenes</h1>
+
+@if (turnosExamenes == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <NuevoEditarTurnoExamen turnoExamen="@currentTurnoExamen" OnCancelar="Cancelar" OnGuardar="Guardar" />
+    <TableIdNombre ListEntity="@(turnosExamenes.Cast<IEntityIdNombre>().ToList())" OnEditar="Editar" OnEliminar="Eliminar" />
+}
+
+    @code {
+        private List<TurnoExamen>? turnosExamenes;
+        private TurnoExamen currentTurnoExamen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        turnosExamenes = await turnoExamenService.GetAllAsync();
+    }
+
+    private async void Eliminar(IEntityIdNombre entity)
+    {
+        var turnoExamen = (TurnoExamen)entity;
+        SweetAlertResult respuesta = await SweetAlert.FireAsync(new SweetAlertOptions
+            {
+                Title = "Borrando Turno de examen",
+                Text = $"¿Está seguro que desea borrar el turno de exmane {turnoExamen.Nombre}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, quiero borrarlo!",
+                CancelButtonText = "No, espera"
+            });
+        if (respuesta.IsConfirmed)
+        {
+            await turnoExamenService.DeleteAsync(turnoExamen.Id);
+            turnosExamenes = await turnoExamenService.GetAllAsync();
+            StateHasChanged();
+        }
+    }
+    private async Task Guardar()
+    {
+        turnosExamenes = await turnoExamenService.GetAllAsync();
+        currentTurnoExamen = null;
+        StateHasChanged();
+
+    }
+    private async Task Cancelar()
+    {
+        currentTurnoExamen = null;
+    }
+    private async Task Editar(IEntityIdNombre entity)
+    {
+        var turnoExamen = (TurnoExamen)entity;
+        currentTurnoExamen = turnoExamen;
+    }
+}

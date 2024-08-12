@@ -1,6 +1,6 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">BlazorAppVS</a>
+        <a class="navbar-brand" href="">Instituto Nº20</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -11,22 +11,34 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
+
+
+@*         <div class="nav-item px-3">
             <NavLink class="nav-link" href="peliculas">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Peliculas
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Películas
+            </NavLink>
+        </div> *@
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="turnosexamenes">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Turnos exámenes
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="cicloslectivos">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ciclos lectivos
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="horas">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Horas
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="docentes">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Docentes
             </NavLink>
         </div>
         <div class="nav-item px-3">
@@ -39,6 +51,22 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Carreras
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="inscripciones">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Inscripciones
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="mesasexamenes">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Mesas de exámenes
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="horarios">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Horarios
+            </NavLink>
+        </div>
+
     </nav>
 </div>
 

@@ -1,0 +1,76 @@
+﻿@inject IGenericService<CicloLectivo> cicloLectivoService
+@inject SweetAlertService SweetAlert
+
+
+@if (cicloLectivoEdit == null )
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div style="background-color: @(isEditing ? "lightyellow": "white")">
+        <EditForm Model="cicloLectivoEdit" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Ciclo Lectivo:</label>
+                    <InputText class="form-control mb-2" type="text" @bind-Value="cicloLectivoEdit.Nombre" />
+                </div>
+                <ValidationSummary />
+                <ButtonsGuardarCancelar isEditing="@isEditing"  OnCancelar="HandleCancelar" />
+            </div>
+        </div>
+    </EditForm>
+    </div>
+}
+@code {
+
+    [Parameter]
+    public EventCallback OnGuardar { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelar { get; set; }
+
+    [Parameter]
+    public CicloLectivo? CicloLectivo { get; set; }
+
+    public CicloLectivo? cicloLectivoEdit { get; set; }
+
+
+
+    private bool isEditing => CicloLectivo != null;
+
+    private List<CicloLectivo>? ciclosLectivos { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (CicloLectivo == null)
+        {
+            cicloLectivoEdit = new CicloLectivo();
+        } else
+        {
+            CicloLectivo.CopyPropertiesTo(cicloLectivoEdit);
+        }
+
+
+        StateHasChanged();
+    }
+
+
+    private async Task Guardar()
+    {
+        // logger.LogInformation($"la variable isEditing={isEditing} y el anio lectivo={anioLectivoEdit?.ToString()}");
+        if (isEditing)
+                await cicloLectivoService.UpdateAsync(cicloLectivoEdit);
+            else
+            await cicloLectivoService.AddAsync(cicloLectivoEdit);
+            await OnGuardar.InvokeAsync();
+    }
+
+    private async Task HandleCancelar()
+    {
+        await OnCancelar.InvokeAsync();
+    }
+}
+

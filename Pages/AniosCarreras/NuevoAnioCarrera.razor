@@ -1,0 +1,44 @@
+﻿@page "/nuevoaniocarrera"
+@inject IAnioCarreraService aniocarreraService
+@inject NavigationManager NavigationManager
+
+@if (aniocarrera == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <h3>Cargando nuevo año carrera a @nombreCarrera </h3>
+    <EditForm Model="aniocarrera" OnValidSubmit="GuardarAnioCarrera" >
+        <DataAnnotationsValidator />
+        <label class="form-control mb-2" for="txtAnioCarrera">Año:</label>
+        <InputText class="form-control mb-2" type="text" @bind-Value="aniocarrera.Nombre"/>
+        <ValidationSummary />
+        <button class="btn btn-primary mb-2" type="submit">Guardar</button>
+        <button class="btn btn-primary mb-2" type="button" @onclick="@(()=>NavigationManager.NavigateTo($"/anioscarreras?idCarrera={idCarrera}&nombreCarrera={nombreCarrera}"))">Volver a la lista</button>
+    </EditForm>
+}
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int? idCarrera { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? nombreCarrera { get; set; }
+
+    public AnioCarrera? aniocarrera { get; set; } 
+
+    protected override void OnInitialized()
+    {
+        aniocarrera = new AnioCarrera();
+        aniocarrera.CarreraId = idCarrera;
+    }
+
+    private async Task GuardarAnioCarrera()
+    {
+        var response = await aniocarreraService.AddAsync(aniocarrera);
+        NavigationManager.NavigateTo($"/anioscarreras?idCarrera={idCarrera}&nombreCarrera={nombreCarrera}");
+    }
+}
+

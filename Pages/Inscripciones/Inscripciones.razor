@@ -1,0 +1,63 @@
+﻿@page "/inscripciones"
+
+@inject IGenericService<Inscripcion> inscripcionService
+@inject IGenericService<CicloLectivo> cicloLectivoService
+@inject SweetAlertService SweetAlert
+
+<PageTitle>Inscripciones</PageTitle>
+<h1>Inscripciones a materias</h1>
+
+@if (inscripciones == null && cicloslectivos== null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    if (idCicloLectivoSeleccionado == null)
+    {
+        <ListCard ListEntity="@(cicloslectivos.Cast<IEntityIdNombre>().ToList())" OnSeleccionar="SeleccionarCicloLectivo" TituloCard="Ciclo Lectivo" />
+    }else
+    {
+        <NavLink class="nav-link" href=@($"nuevainscripcion?idCicloLectivo={idCicloLectivoSeleccionado}")> Nueva Inscripción</NavLink>
+
+        <TableInscripciones Inscripciones="@inscripciones" OnEliminar="Eliminar" />
+    }
+}
+
+@code {
+
+    private List<Inscripcion>? inscripciones;
+    private List<CicloLectivo>? cicloslectivos;
+    private int? idCicloLectivoSeleccionado;
+
+    protected override async Task OnInitializedAsync()
+    {
+        inscripciones = await inscripcionService.GetAllAsync();
+        cicloslectivos = await cicloLectivoService.GetAllAsync();
+    }
+
+    private async void Eliminar(Inscripcion inscripcion)
+    {
+        SweetAlertResult respuesta = await SweetAlert.FireAsync(new SweetAlertOptions
+            {
+                Title = "Borrando Inscripción",
+                Text = $"¿Está seguro que desea borrar la inscripción de {inscripcion.Alumno?.ApellidoNombre}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, quiero borrarlo!",
+                CancelButtonText = "No, espera"
+            });
+        if (respuesta.IsConfirmed)
+        {
+            await inscripcionService.DeleteAsync(inscripcion.Id);
+            inscripciones = await inscripcionService.GetAllAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task SeleccionarCicloLectivo(int idCicloLectivo)
+    {
+        idCicloLectivoSeleccionado = idCicloLectivo;
+        StateHasChanged();
+    }
+}

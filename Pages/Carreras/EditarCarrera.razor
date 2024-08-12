@@ -1,5 +1,5 @@
 ﻿@page "/editarcarrera"
-@inject HttpClient Http
+@inject ICarreraService carreraService
 @inject NavigationManager NavigationManager
 
 @if (carrera == null)
@@ -8,18 +8,19 @@
 }
 else
 {
-    <h3>Editando carrera @carrera.nombre</h3>
-    <EditForm Model="carrera" OnValidSubmit="GuardarCarrera">
+    <h3>Editando carrera @carrera.Nombre</h3>
+    <EditForm Model="carrera" OnValidSubmit="GuardarCarrera" >
         <DataAnnotationsValidator />
+        <label class="form-label mb-2" for="txtCarrera">Carrera:</label>
+        <InputText class="form-control mb-2" type="text" @bind-Value="carrera.Nombre" />
+        <label class="form-label mb-2" for="txtCarrera">Sigla:</label>
+        <InputText class="form-control mb-2" type="text" @bind-Value="carrera.Sigla" />
         <ValidationSummary />
-        <label class="form-control" for="txtCarrera">Carrera:</label>
-        <input class="form-control" type="text" @bind="carrera.nombre" />
-        <button class="btn btn-primary" type="submit">Guardar</button>
-        <button class="btn btn-primary" type="button" @onclick="Volver">Cancelar</button>
+        <button class="btn btn-primary mb-2" type="submit">Guardar</button>
+        <button class="btn btn-primary mb-2" type="button" @onclick="@(()=>NavigationManager.NavigateTo("/carreras"))">Volver a la lista</button>
     </EditForm>
 }
 @code {
-
     [SupplyParameterFromQuery]
     [Parameter]
     public string? idCarrera { get; set; }
@@ -28,23 +29,13 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        carrera = await Http.GetFromJsonAsync<Carrera>("https://inscripcionesfedeb.azurewebsites.net/api/apicarreras/" + idCarrera);
-    }
-
-    public class Carrera
-    {
-        public int id { get; set; }
-        [Required(ErrorMessage = "El nombre debe cargarse obligatoriamente")]
-        public string nombre { get; set; } = string.Empty;
+        carrera = await carreraService.Get(int.Parse(idCarrera));
     }
 
     private async Task GuardarCarrera()
     {
-        var response = await Http.PutAsJsonAsync($"https://inscripcionesfedeb.azurewebsites.net/api/apicarreras/{carrera?.id}", carrera);
-        NavigationManager.NavigateTo("/carreras");
-    }
-    private void Volver()
-    {
+        await carreraService.Put(carrera);
         NavigationManager.NavigateTo("/carreras");
     }
 }
+

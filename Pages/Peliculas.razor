@@ -3,9 +3,9 @@
 
 <PageTitle>Peliculas</PageTitle>
 
-<ComponenteTitulo Titulo="Alumnos" />
+<h1>Peliculas</h1>
 
-<p>Los mejores estrenos</p>
+<p>Los mejores estrenos.</p>
 
 @if (pelis == null)
 {
@@ -18,7 +18,7 @@ else
             <tr>
                 <th>Nombre</th>
                 <th>Genero</th>
-                <th>Duracion</th>
+                <th>Duración</th>
                 <th>Sinopsis</th>
             </tr>
         </thead>
@@ -39,6 +39,7 @@ else
 @code {
     private Pelicula[]? pelis;
 
+
     protected override async Task OnInitializedAsync()
     {
         pelis = await Http.GetFromJsonAsync<Pelicula[]>("https://practprof2023-2855.restdb.io/rest/peliculas?apikey=6466d9870b60fc42f4e197bf");
@@ -46,18 +47,12 @@ else
 
     public class Pelicula
     {
-        public string _id { get; set; }
-
-        public string nombre { get; set; } 
-
-        public string genero { get; set; } 
-
+        public string _id { get; set; }=String.Empty;
+        public string nombre { get; set; }=String.Empty;
+        public string genero { get; set; }=String.Empty;
         public int duracion { get; set; }
-
-        public string trailer_url { get; set; } 
-
-        public string sinopsis { get; set; } 
-
-        public string portada_url { get; set; } 
+        public string trailer_url { get; set; }=String.Empty;
+        public string sinopsis { get; set; }=String.Empty;
+        public string portada_url { get; set; }=String.Empty;
     }
 }

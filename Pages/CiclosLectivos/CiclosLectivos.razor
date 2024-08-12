@@ -1,0 +1,63 @@
+﻿@page "/cicloslectivos"
+
+@inject IGenericService<CicloLectivo> cicloLectivoService
+@inject SweetAlertService SweetAlert
+
+<PageTitle>Ciclos Lectivos</PageTitle>
+<h1>Ciclos Lectivos</h1>
+
+@if (ciclosLectivos == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <NuevoEditarCicloLectivo CicloLectivo="@currentCicloLectivo" OnCancelar="Cancelar" OnGuardar="Guardar" />
+    <TableIdNombre ListEntity="@(ciclosLectivos.Cast<IEntityIdNombre>().ToList())" OnEditar="Editar" OnEliminar="Eliminar" />
+}
+
+@code {
+    private List<CicloLectivo> ciclosLectivos;
+    private CicloLectivo currentCicloLectivo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ciclosLectivos = await cicloLectivoService.GetAllAsync();
+    }
+
+    private async void Eliminar(IEntityIdNombre entity)
+    {
+        var cicloLectivo = (CicloLectivo)entity;
+        SweetAlertResult respuesta = await SweetAlert.FireAsync(new SweetAlertOptions
+            {
+                Title = "Borrando Ciclo Lectivo",
+                Text = $"¿Está seguro que desea borrar el ciclo lectivo {cicloLectivo.Nombre}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, quiero borrarlo!",
+                CancelButtonText = "No, espera"
+            });
+        if (respuesta.IsConfirmed)
+        {
+            await cicloLectivoService.DeleteAsync(cicloLectivo.Id);
+            ciclosLectivos = await cicloLectivoService.GetAllAsync();
+            StateHasChanged();
+        }
+    }
+    private async Task Guardar()
+    {
+        ciclosLectivos = await cicloLectivoService.GetAllAsync();
+        currentCicloLectivo = null;
+        StateHasChanged();
+
+    }
+    private async Task Cancelar()
+    {
+        currentCicloLectivo = null;
+    }
+    private async Task Editar(IEntityIdNombre entity)
+    {
+        var anioLectivo = (CicloLectivo)entity;
+        currentCicloLectivo = anioLectivo;
+    }
+}

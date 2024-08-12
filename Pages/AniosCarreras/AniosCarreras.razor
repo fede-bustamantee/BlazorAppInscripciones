@@ -1,0 +1,87 @@
+﻿@page "/anioscarreras"
+
+@inject IAnioCarreraService aniocarreraService
+@inject SweetAlertService SweetAlert
+
+<PageTitle>Años carreras</PageTitle>
+<h1>@nombreCarrera</h1>
+
+@if (anioscarreras == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <NavLink class="nav-link" href=@($"nuevoaniocarrera?idCarrera={idCarrera}&nombreCarrera={nombreCarrera}")>  
+        Nuevo Año Carrera
+    </NavLink>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var aniocarrera in anioscarreras)
+            {
+                <tr>
+                    <td>@aniocarrera.Id</td>
+                    <td>@aniocarrera.Nombre</td>
+                    <td>
+                        <NavLink class="nav-link" href=@($"materias?idAnioCarrera={aniocarrera.Id}&nombreAnioCarrera={aniocarrera.AñoYCarrera}")>
+                            Materias
+                        </NavLink>
+                    </td>
+                    <td>
+                        <NavLink class="nav-link" href=@($"editaraniocarrera?idAnioCarrera={aniocarrera.Id}&nombreCarrera={nombreCarrera}")>
+                            Editar
+                        </NavLink>
+                    </td>
+                    <td>
+                        <button title="Eliminar" class="btn btn-danger" @onclick="@(()=>Eliminar(aniocarrera))">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int? idCarrera { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? nombreCarrera { get; set; }
+
+    private List<AnioCarrera>? anioscarreras;
+
+    protected override async Task OnInitializedAsync()
+    {
+        anioscarreras = await aniocarreraService.GetByCarreraAsync(idCarrera);
+    }
+
+    private async void Eliminar(AnioCarrera anioCarrera)
+    {
+        SweetAlertResult respuesta = await SweetAlert.FireAsync(new SweetAlertOptions
+            {
+                Title = "Borrando Año carrera",
+                Text = $"¿Está seguro que desea borrar el año {anioCarrera.Nombre}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, quiero borrarlo!",
+                CancelButtonText = "No, espera"
+            });
+        if (respuesta.IsConfirmed)
+        {
+            await aniocarreraService.DeleteAsync(anioCarrera.Id);
+            anioscarreras = await aniocarreraService.GetByCarreraAsync(idCarrera);
+            StateHasChanged();
+        }
+    }
+}

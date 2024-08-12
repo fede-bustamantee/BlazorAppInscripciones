@@ -1,0 +1,63 @@
+﻿@page "/horas"
+
+@inject IGenericService<Hora> horaService
+@inject SweetAlertService SweetAlert
+
+<PageTitle>Horas</PageTitle>
+<h1>Horas</h1>
+
+@if (horas == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <NuevoEditarHora Hora="@currentHora" OnCancelar="Cancelar" OnGuardar="Guardar" />
+    <TableIdNombre ListEntity="@(horas.Cast<IEntityIdNombre>().ToList())" OnEditar="Editar" OnEliminar="Eliminar" />
+}
+
+@code {
+    private List<Hora>? horas;
+    private Hora? currentHora;
+
+    protected override async Task OnInitializedAsync()
+    {
+        horas = await horaService.GetAllAsync();
+    }
+
+    private async void Eliminar(IEntityIdNombre entity)
+    {
+        var hora = (Hora)entity;
+        SweetAlertResult respuesta = await SweetAlert.FireAsync(new SweetAlertOptions
+            {
+                Title = "Borrando Hora",
+                Text = $"¿Está seguro que desea borrar la hora {hora.Nombre}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, quiero borrarlo!",
+                CancelButtonText = "No, espera"
+            });
+        if (respuesta.IsConfirmed)
+        {
+            await horaService.DeleteAsync(hora.Id);
+            horas = await horaService.GetAllAsync();
+            StateHasChanged();
+        }
+    }
+    private async Task Guardar()
+    {
+        horas = await horaService.GetAllAsync();
+        currentHora = null;
+        StateHasChanged();
+
+    }
+    private async Task Cancelar()
+    {
+        currentHora = null;
+    }
+    private async Task Editar(IEntityIdNombre entity)
+    {
+        var hora = (Hora)entity;
+        currentHora = hora;
+    }
+}

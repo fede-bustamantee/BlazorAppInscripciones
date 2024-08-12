@@ -1,0 +1,17 @@
+﻿<div class="col-md-3">
+    <label class="form-label ">Materia:</label>
+    <InputSelect class="form-control mb-2" @bind-Value="detalleInscripcion.MateriaId">
+        @foreach (var materia in materias)
+        {
+            <option value="@materia.Id">@materia.Nombre</option>
+        }
+    </InputSelect>
+</div>
+
+@code {
+    [Parameter]
+    public DetalleInscripcion detalleInscripcion { get; set; }
+
+    [Parameter]
+    public List<Materia> materias { get; set; }
+}

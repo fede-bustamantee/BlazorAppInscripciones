@@ -1,0 +1,63 @@
+﻿@page "/docentes"
+
+@inject IGenericService<Docente> docenteService
+@inject SweetAlertService SweetAlert
+
+<PageTitle>Docentes</PageTitle>
+<h1>Docentes</h1>
+
+@if (docentes == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <NuevoEditarDocente Docente="@currentDocente" OnCancelar="Cancelar" OnGuardar="Guardar" />
+    <TableIdNombre ListEntity="@(docentes.Cast<IEntityIdNombre>().ToList())" OnEditar="Editar" OnEliminar="Eliminar" />
+}
+
+    @code {
+        private List<Docente>? docentes;
+        private Docente currentDocente;
+
+    protected override async Task OnInitializedAsync()
+    {
+        docentes = await docenteService.GetAllAsync();
+    }
+
+    private async void Eliminar(IEntityIdNombre entity)
+    {
+        var docente = (Docente)entity;
+        SweetAlertResult respuesta = await SweetAlert.FireAsync(new SweetAlertOptions
+            {
+                Title = "Borrando docente",
+                Text = $"¿Está seguro que desea borrar al docente {docente.Nombre}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, quiero borrarlo!",
+                CancelButtonText = "No, espera"
+            });
+        if (respuesta.IsConfirmed)
+        {
+            await docenteService.DeleteAsync(docente.Id);
+            docentes = await docenteService.GetAllAsync();
+            StateHasChanged();
+        }
+    }
+    private async Task Guardar()
+    {
+        docentes = await docenteService.GetAllAsync();
+        currentDocente = null;
+        StateHasChanged();
+
+    }
+    private async Task Cancelar()
+    {
+        currentDocente = null;
+    }
+    private async Task Editar(IEntityIdNombre entity)
+    {
+        var docente = (Docente)entity;
+        currentDocente = docente;
+    }
+}

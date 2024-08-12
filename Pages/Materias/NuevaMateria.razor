@@ -1,0 +1,44 @@
+﻿@page "/nuevamateria"
+@inject IMateriaService materiaService
+@inject NavigationManager NavigationManager
+
+@if (materia == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <h3>Cargando materia a @nombreAnioCarrera </h3>
+    <EditForm Model="materia" OnValidSubmit="GuardarMateria">
+        <DataAnnotationsValidator />
+        <label class="form-control mb-2" >Materia:</label>
+        <InputText class="form-control mb-2" type="text" @bind-Value="materia.Nombre"/>
+        <ValidationSummary />
+        <button class="btn btn-primary mb-2" type="submit">Guardar</button>
+        <button class="btn btn-primary mb-2" type="button" @onclick="@(()=>NavigationManager.NavigateTo($"/materias?idAnioCarrera={idAnioCarrera}&nombreAnioCarrera={nombreAnioCarrera}"))">Volver a la lista</button>
+    </EditForm>
+}
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int idAnioCarrera { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? nombreAnioCarrera { get; set; }
+
+    public Materia? materia { get; set; } 
+
+    protected override void OnInitialized()
+    {
+        materia = new Materia();
+        materia.AnioCarreraId = idAnioCarrera;
+    }
+
+    private async Task GuardarMateria()
+    {
+        var response = await materiaService.AddAsync(materia);
+        NavigationManager.NavigateTo($"/materias?idAnioCarrera={idAnioCarrera}&nombreAnioCarrera={nombreAnioCarrera}");
+    }
+}
+

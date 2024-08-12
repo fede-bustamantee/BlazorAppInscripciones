@@ -1,0 +1,76 @@
+﻿@page "/mesasexamenes"
+
+@inject IGenericService<TurnoExamen> turnoExamenService
+@inject IGenericService<Carrera> carreraService
+@inject IMesaExamenService mesaExamenService
+@inject SweetAlertService SweetAlert
+@inject ILogger<MesasExamenes> logger
+
+<PageTitle>Mesas de exámenes</PageTitle>
+<h1>Mesas de exámenes</h1>
+
+@if (turnosExamenes == null && carreras==null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    
+    if(idTurnoExamenSeleccionado==null)
+    {
+        <ListCard ListEntity="@(turnosExamenes.Cast<IEntityIdNombre>().ToList())" OnSeleccionar="SeleccionarTurnoExamem" TituloCard="Turno de examen" />
+    }
+    else
+    {
+        if(idCarreraSeleccionada==null)
+        {
+            <ListCard ListEntity="@(carreras.Cast<IEntityIdNombre>().ToList())" OnSeleccionar="SeleccionarCarrera" TituloCard="Carrera" />
+        }else
+        {
+            <div class="text-end">
+                <button class="btn btn-info" @onclick="VolverAListaCarreras">Volver a lista de carreras</button>
+            </div>
+            <TableMesaExamen MesasExamenes="mesasExamenes"/>
+        }
+        
+    }
+}
+
+@code {
+    private List<TurnoExamen>? turnosExamenes;
+    private List<Carrera>? carreras;
+    private List<MesaExamen>? mesasExamenes;
+
+    private int? idTurnoExamenSeleccionado;
+    private int? idCarreraSeleccionada;
+
+    protected override async Task OnInitializedAsync()
+    {
+        turnosExamenes = await turnoExamenService.GetAllAsync();
+        carreras = await carreraService.GetAllAsync();
+
+    }
+
+    private async Task SeleccionarTurnoExamem(int idTurno)
+    {
+        idTurnoExamenSeleccionado = idTurno;
+        StateHasChanged();
+    }
+
+    private async Task SeleccionarCarrera(int idCarrera)
+    {
+        idCarreraSeleccionada = idCarrera;
+        mesasExamenes = await mesaExamenService.GetByTurnoAndCarreraAsync(idTurnoExamenSeleccionado, idCarreraSeleccionada);
+        logger.LogInformation(mesasExamenes.Count.ToString());
+        StateHasChanged();
+    }
+
+    private async Task VolverAListaCarreras()
+    {
+        idCarreraSeleccionada = null;
+        mesasExamenes = null;
+        StateHasChanged();
+    }
+
+    
+}

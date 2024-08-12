@@ -1,0 +1,55 @@
+﻿@if (Inscripciones == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Alumno</th>
+                <th>Carrera</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var inscripcion in Inscripciones)
+            {
+                <tr>
+                    <td>@inscripcion.Id</td>
+                    <td>@inscripcion.Alumno.ApellidoNombre</td>
+                    <td>@inscripcion.Carrera.Nombre</td>
+                    <td>
+                        <NavLink class="nav-link" href=@($"detalleinscripciones?idInscripcion={inscripcion.Id}&nombreInscripcion={inscripcion.Alumno.ApellidoNombre}-{inscripcion.Carrera.Nombre}")>
+                            Inscribir a materias
+                        </NavLink>
+                    </td>
+                    <td>
+                        <NavLink class="nav-link" href=@($"editarinscripcion?idInscripcion={inscripcion.Id}")>
+                            Editar
+                        </NavLink>
+                    </td>
+                    <td>
+                        <button title="Eliminar" class="btn btn-danger" @onclick="@(()=>HandleEliminar(inscripcion))">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    [Parameter]
+    public List<Inscripcion> Inscripciones { get; set; }
+
+    [Parameter]
+    public EventCallback<Inscripcion> OnEliminar { get; set; }
+
+    private void HandleEliminar(Inscripcion inscripcion)
+    {
+        OnEliminar.InvokeAsync(inscripcion);
+    }
+}

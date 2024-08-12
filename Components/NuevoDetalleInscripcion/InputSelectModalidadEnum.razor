@@ -1,0 +1,15 @@
+﻿<div class="col-md-2">
+    <label class="form-label ">Modalidad:</label>
+    <InputSelect class="form-control mb-2" @bind-Value="detalleInscripcion.ModalidadCursado">
+        @foreach (var option in Enum.GetValues(typeof(ModalidadCursadoEnum)))
+        {
+            <option value="@option">@option</option>
+        }
+    </InputSelect>
+</div>
+
+@code {
+    [Parameter]
+    public DetalleInscripcion detalleInscripcion { get; set; }
+
+}
