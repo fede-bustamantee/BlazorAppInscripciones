@@ -1,0 +1,14 @@
+﻿<div class="col-md-3">
+    <label class="form-label">@TextLabel</label>
+    <InputText class="form-control mb-2" type="text" @bind-Value="@Entity.Nombre" />
+</div>
+
+@code {
+    [Parameter]
+    public IEntityIdNombre Entity { get; set; }
+
+    [Parameter]
+    public string TextLabel { get; set; }
+
+
+}

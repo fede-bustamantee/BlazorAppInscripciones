@@ -1,0 +1,97 @@
+﻿@page "/detalleinscripciones"
+
+@inject IDetalleInscripcionService detalleInscripcionService
+@inject SweetAlertService SweetAlert
+
+<PageTitle>Inscripción a materias</PageTitle>
+<h1>Inscripción de @nombreInscripcion</h1>
+
+@if (detallesInscripcion == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <NuevoDetalleInscripcion idInscripcion="@idInscripcion" OnGuardar="Guardar" OnCancelar="Cancelar" detalleInscripcion="@currentDetalleInscripcion" />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Materia</th>
+                <th>Año</th>
+                <th>Modalidad</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detalleInscripcion in detallesInscripcion)
+            {
+                <tr>
+                    <td>@detalleInscripcion.Id</td>
+                    <td>@detalleInscripcion.Materia?.Nombre</td>
+                    <td>@detalleInscripcion.Materia?.AnioCarrera?.Nombre</td>
+                    <td>@detalleInscripcion.ModalidadCursado</td>
+                    <td>
+                        <button class="btn btn-primary mb-2" @onclick="()=>EditDetalle(detalleInscripcion)">Editar</button>
+                    </td>
+                    <td>
+                        <button title="Eliminar" class="btn btn-danger" @onclick="@(()=>Eliminar(detalleInscripcion))">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int idInscripcion { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? nombreInscripcion { get; set; }
+
+    private List<DetalleInscripcion>? detallesInscripcion;
+    private DetalleInscripcion? currentDetalleInscripcion;
+
+    protected override async Task OnInitializedAsync()
+    {
+        detallesInscripcion = await detalleInscripcionService.GetByInscripcionAsync(idInscripcion);
+    }
+
+    private async void Eliminar(DetalleInscripcion detalleInscripcion)
+    {
+        SweetAlertResult respuesta = await SweetAlert.FireAsync(new SweetAlertOptions
+            {
+                Title = "Borrando una materia de la inscripción",
+                Text = $"¿Está seguro que desea quitar la materia {detalleInscripcion.Materia.Nombre}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, quiero quitarla!",
+                CancelButtonText = "No, espera"
+            });
+        if (respuesta.IsConfirmed)
+        {
+            await detalleInscripcionService.DeleteAsync(detalleInscripcion.Id);
+            detallesInscripcion = await detalleInscripcionService.GetByInscripcionAsync(idInscripcion);
+            StateHasChanged();
+        }
+    }
+    private async Task Guardar()
+    {
+        detallesInscripcion = await detalleInscripcionService.GetByInscripcionAsync(idInscripcion);
+        currentDetalleInscripcion = null;
+        StateHasChanged();
+        
+    }
+    private async Task Cancelar()
+    {
+        currentDetalleInscripcion = null;
+    }
+    private async Task EditDetalle(DetalleInscripcion detalleInscripcion)
+    {
+        currentDetalleInscripcion = detalleInscripcion;
+    }
+}

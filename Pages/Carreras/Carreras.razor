@@ -1,36 +1,50 @@
 ﻿@page "/carreras"
-@inject HttpClient Http
+
+@inject ICarreraService carreraService
+@inject SweetAlertService SweetAlert
 
 <PageTitle>Carreras</PageTitle>
+<h1>Carreras</h1>
 
-<ComponenteTitulo Titulo="Carreras" />
-
-<p>Carreras del sitio web</p>
-
-@if (studies == null)
+@if (carreras == null)
 {
     <p><em>Cargando...</em></p>
 }
 else
 {
-    <td>
-        <NavLink class="nav-link" href="nuevacarrera">Nueva Carrera</NavLink>
-    </td>
+    <NavLink class="nav-link" href="nuevacarrera">
+        Nueva Carrera
+    </NavLink>
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Nombre</th>
+                <th>Sigla</th>
+                <th></th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var study in studies)
+            @foreach (var carrera in carreras)
             {
                 <tr>
-                    <td>@study.id</td>
-                    <td>@study.nombre</td>
+                    <td>@carrera.Id</td>
+                    <td>@carrera.Nombre</td>
+                    <td>@carrera.Sigla</td>
                     <td>
-                       <NavLink class="nav-link" href="@($"editarcarrera?idCarrera={@study.id}")">Editar</NavLink>
+                        <NavLink class="nav-link" href=@($"anioscarreras?idCarrera={@carrera.Id}&nombreCarrera={carrera.Nombre}")>
+                            Años carrera
+                        </NavLink>
+                    </td>
+                    <td>
+                        <NavLink class="nav-link" href=@($"editarcarrera?idCarrera={@carrera.Id}")>
+                            Editar
+                        </NavLink>
+                    </td>
+                    <td>
+                        <button title="Eliminar" class="btn btn-danger" @onclick="@(()=>Eliminar(carrera))">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -39,16 +53,29 @@ else
 }
 
 @code {
-    private Carrera[]? studies;
+    private List<Carrera>? carreras;
 
     protected override async Task OnInitializedAsync()
     {
-        studies = await Http.GetFromJsonAsync<Carrera[]>("https://inscripcionesfedeb.azurewebsites.net/api/apicarreras");
+        carreras = await carreraService.Get();
     }
 
-    public class Carrera
+    private async void Eliminar(Carrera carrera)
     {
-        public int id { get; set; }
-        public string nombre { get; set; }
+        SweetAlertResult respuesta = await SweetAlert.FireAsync(new SweetAlertOptions
+            {
+                Title = "Borrando Carrera",
+                Text = $"¿Está seguro que desea borrar a la carrera {carrera.Nombre}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, quiero borrarlo!",
+                CancelButtonText = "No, espera"
+            });
+        if (respuesta.IsConfirmed)
+        {
+            await carreraService.Delete(carrera.Id);
+            carreras = await carreraService.Get();
+            StateHasChanged();
+        }
     }
 }

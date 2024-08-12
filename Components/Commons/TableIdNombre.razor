@@ -1,0 +1,46 @@
+﻿<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entity in ListEntity)
+        {
+            <tr>
+                <td>@entity.Id</td>
+                <td>@entity.Nombre</td>
+                <td>
+                    <button class="btn btn-primary mb-2" @onclick="()=>HandleEditar(entity)">Editar</button>
+                </td>
+                <td>
+                    <button title="Eliminar" class="btn btn-danger" @onclick="@(()=>HandleEliminar(entity))">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public List<IEntityIdNombre> ListEntity { get; set; }
+
+    [Parameter]
+    public EventCallback<IEntityIdNombre> OnEditar { get; set; }
+
+    [Parameter]
+    public EventCallback<IEntityIdNombre> OnEliminar { get; set; }
+
+    private void HandleEditar(IEntityIdNombre entity)
+    {
+        OnEditar.InvokeAsync(entity);
+    }
+
+    private void HandleEliminar(IEntityIdNombre entity)
+    {
+        OnEliminar.InvokeAsync(entity);
+    }
+}

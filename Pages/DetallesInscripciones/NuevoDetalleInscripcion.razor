@@ -1,0 +1,122 @@
+﻿@inject IDetalleInscripcionService detalleInscripcionService
+@inject IMateriaService materiaService
+@inject IAnioCarreraService anioCarreraService
+@inject IGenericService<Inscripcion> inscripcionService
+@inject SweetAlertService SweetAlert
+@inject NavigationManager NavigationManager
+@inject ILogger<NuevoDetalleInscripcion> logger
+
+@if (inscripcion == null|| materias==null || aniosCarrera==null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div style="background-color: @(isEditing ? "lightyellow": "white")">
+    <EditForm Model="detalleInscripcionEdit" OnValidSubmit="Guardar" >
+        <DataAnnotationsValidator />
+        <div class="container">
+            <div class="row">
+                <InputSelectAniosCarrera idAnioCarrera="@idAnioCarrera" aniosCarrera="@aniosCarrera" parentUpdateMaterias="@ActualizarMaterias" />
+                <InputSelectMaterias detalleInscripcion="@detalleInscripcionEdit" materias="@materias" />
+                    <InputSelectModalidadEnum detalleInscripcion="@detalleInscripcionEdit" />
+                <ValidationSummary />
+                <ButtonsGuardarCancelar isEditing="@isEditing"  OnCancelar="Cancelar" />
+            </div>
+        </div>
+    </EditForm>
+    </div>
+}
+@code {
+    [Parameter]
+    [EditorRequired]
+    public int idInscripcion { get; set; }
+
+    [Parameter]
+    public EventCallback OnGuardar { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelar { get; set; }
+
+    [Parameter]
+    public DetalleInscripcion? detalleInscripcion { get; set; }
+
+    public DetalleInscripcion? detalleInscripcionEdit { get; set; }
+
+    
+
+    private bool isEditing => detalleInscripcion != null;
+
+    private List<Materia>? materias { get; set; }
+    private List<AnioCarrera>? aniosCarrera { get; set; }
+    private Inscripcion? inscripcion { get; set; }
+    private int? idAnioCarrera { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (detalleInscripcion==null)
+        {
+            detalleInscripcionEdit = new DetalleInscripcion();
+            detalleInscripcionEdit.InscripcionId = idInscripcion;
+            idAnioCarrera=aniosCarrera?.First().Id;
+            materias = await materiaService.GetByAnioCarreraAsync(idAnioCarrera);
+            detalleInscripcionEdit.MateriaId = materias.First().Id;
+        } else
+        {
+            detalleInscripcion.CopyPropertiesTo(detalleInscripcionEdit);
+            idAnioCarrera = detalleInscripcionEdit?.Materia?.AnioCarreraId;
+            materias = await materiaService.GetByAnioCarreraAsync(idAnioCarrera);
+
+        }
+
+            
+        StateHasChanged();
+        logger.LogInformation($"el idAnioCarrera es igual {idAnioCarrera}");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        inscripcion = await inscripcionService.GetByIdAsync(idInscripcion);
+        aniosCarrera = await anioCarreraService.GetByCarreraAsync(inscripcion?.CarreraId);
+    }
+
+    private async Task ActualizarMaterias(ChangeEventArgs e)
+    {
+        idAnioCarrera = int.Parse(e.Value.ToString());
+        materias= await materiaService.GetByAnioCarreraAsync(idAnioCarrera);
+        detalleInscripcionEdit.MateriaId = materias.First().Id;
+    }
+
+    private async Task Guardar()
+    {
+        logger.LogInformation(detalleInscripcionEdit.ToString());
+
+        if (await detalleInscripcionService.CheckDuplicadoDetalleInscripcionAsync(detalleInscripcionEdit?.Id, detalleInscripcionEdit?.InscripcionId, detalleInscripcionEdit?.MateriaId))
+        {
+            await SweetAlert.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Materia duplicada",
+                    Text = $"La materia ya existe en la inscripción",
+                    Icon = SweetAlertIcon.Info,
+                    ShowCancelButton = false,
+                    ConfirmButtonText = "Aceptar",
+                });
+            return;
+        }
+        else
+        {
+            if (isEditing)
+                await detalleInscripcionService.UpdateAsync(detalleInscripcionEdit);
+            else
+                await detalleInscripcionService.AddAsync(detalleInscripcionEdit);
+            await OnGuardar.InvokeAsync();
+        }
+
+        
+    }
+
+    private async Task Cancelar()
+    {
+        await OnCancelar.InvokeAsync();
+    }
+}
+

@@ -1,0 +1,27 @@
+﻿<div class="col-md-3">
+    <label class="form-label">Año:</label>
+    <select class="form-control mb-2" value="@idAnioCarrera" @onchange="childUpdateMaterias">
+        @foreach (var anioCarrera in aniosCarrera)
+        {
+            <option value="@anioCarrera.Id">@anioCarrera.Nombre</option>
+        }
+    </select>
+</div>
+
+@code {
+    [Parameter]
+    public int? idAnioCarrera { get; set; }
+
+    [Parameter]
+    public List<AnioCarrera> aniosCarrera { get; set; }
+
+    [Parameter]
+    public EventCallback<ChangeEventArgs> parentUpdateMaterias { get; set; }
+
+    private void childUpdateMaterias(ChangeEventArgs e)
+    {
+        parentUpdateMaterias.InvokeAsync(e);
+    }
+
+
+}

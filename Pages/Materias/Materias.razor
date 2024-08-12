@@ -1,0 +1,80 @@
+﻿@page "/materias"
+
+@inject IMateriaService materiaService
+@inject SweetAlertService SweetAlert
+
+<PageTitle>Materias</PageTitle>
+<h1>@nombreAnioCarrera</h1>
+
+@if (materias == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <NavLink class="nav-link" href=@($"nuevamateria?idAnioCarrera={idAnioCarrera}&nombreAnioCarrera={nombreAnioCarrera}")>  
+        Nuevo Materia
+    </NavLink>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var materia in materias)
+            {
+                <tr>
+                    <td>@materia.Id</td>
+                    <td>@materia.Nombre</td>
+                    <td>
+                        <NavLink class="nav-link" href=@($"editarmateria?idMateria={materia.Id}&idAnioCarrera={idAnioCarrera}&nombreAnioCarrera={nombreAnioCarrera}")>
+                            Editar
+                        </NavLink>
+                    </td>
+                    <td>
+                        <button title="Eliminar" class="btn btn-danger" @onclick="@(()=>Eliminar(materia))">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int? idAnioCarrera { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string? nombreAnioCarrera { get; set; }
+
+    private List<Materia>? materias;
+
+    protected override async Task OnInitializedAsync()
+    {
+        materias = await materiaService.GetByAnioCarreraAsync(idAnioCarrera);
+    }
+
+    private async void Eliminar(Materia materia)
+    {
+        SweetAlertResult respuesta = await SweetAlert.FireAsync(new SweetAlertOptions
+            {
+                Title = "Borrando Materia",
+                Text = $"¿Está seguro que desea borrar la materia {materia.Nombre}",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Si, quiero borrarlo!",
+                CancelButtonText = "No, espera"
+            });
+        if (respuesta.IsConfirmed)
+        {
+            await materiaService.DeleteAsync(materia.Id);
+            materias = await materiaService.GetByAnioCarreraAsync(idAnioCarrera);
+            StateHasChanged();
+        }
+    }
+}
